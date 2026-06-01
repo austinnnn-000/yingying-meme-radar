@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>嘤嘤 Meme Radar</title>
+    <meta name="theme-color" content="#101416" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="嘤嘤雷达" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.json?v=5" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon.svg" />
+    <link rel="stylesheet" href="./styles.css?v=5" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="导航">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">嘤</div>
+          <div>
+            <h1>嘤嘤雷达</h1>
+            <p>Meme Radar</p>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" data-view="radar" title="雷达">
+            <span aria-hidden="true">⌁</span>
+            <span>雷达</span>
+          </button>
+          <button class="nav-item" data-view="news" title="新闻">
+            <span aria-hidden="true">◷</span>
+            <span>新闻</span>
+          </button>
+          <button class="nav-item" data-view="alerts" title="告警">
+            <span aria-hidden="true">!</span>
+            <span>告警</span>
+          </button>
+        </nav>
+
+        <section class="side-panel">
+          <div class="panel-title">链</div>
+          <div class="chain-grid" id="chainFilters">
+            <button class="chip active" data-chain="all">全部</button>
+            <button class="chip" data-chain="solana">Solana</button>
+            <button class="chip" data-chain="base">Base</button>
+            <button class="chip" data-chain="ethereum">ETH</button>
+            <button class="chip" data-chain="bsc">BSC</button>
+          </div>
+        </section>
+
+        <section class="side-panel compact">
+          <div class="panel-title">合约盯盘</div>
+          <form class="token-add-form" id="tokenAddForm">
+            <input id="tokenAddressInput" type="text" placeholder="粘贴 token 合约地址" autocomplete="off" />
+            <button type="submit">添加</button>
+          </form>
+          <div class="tracked-addresses" id="trackedAddresses">暂无手动盯盘</div>
+        </section>
+
+        <section class="side-panel compact">
+          <div class="panel-title">自选</div>
+          <div class="watchlist" id="watchlist">暂无自选</div>
+        </section>
+
+        <section class="side-panel compact">
+          <div class="panel-title">告警阈值</div>
+          <label class="range-row">
+            <span>热度</span>
+            <input id="heatThreshold" type="range" min="40" max="95" value="72" />
+            <strong id="heatValue">72</strong>
+          </label>
+          <label class="toggle-row">
+            <span>桌面提示</span>
+            <input id="desktopAlerts" type="checkbox" />
+          </label>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">实时扫描</p>
+            <h2>链上 Meme 与新闻动态</h2>
+          </div>
+          <div class="top-actions">
+            <label class="search-wrap">
+              <span aria-hidden="true">⌕</span>
+              <input id="searchInput" type="search" placeholder="搜索 / 粘贴合约回车" />
+            </label>
+            <button id="refreshButton" class="icon-button" title="刷新" aria-label="刷新">↻</button>
+          </div>
+        </header>
+
+        <section class="metric-grid" aria-label="总览指标">
+          <article class="metric">
+            <span>追踪池子</span>
+            <strong id="trackedPairs">0</strong>
+            <small id="pairDelta">等待同步</small>
+          </article>
+          <article class="metric">
+            <span>高热信号</span>
+            <strong id="hotSignals">0</strong>
+            <small>过去 15 分钟</small>
+          </article>
+          <article class="metric">
+            <span>平均风险</span>
+            <strong id="avgRisk">0</strong>
+            <small>越低越稳</small>
+          </article>
+          <article class="metric">
+            <span>新闻催化</span>
+            <strong id="newsCatalysts">0</strong>
+            <small>已匹配热点</small>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <section class="primary-pane" aria-label="币种雷达">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Radar</p>
+                <h3>实时币种</h3>
+              </div>
+              <div class="segmented" id="sortTabs" role="tablist" aria-label="排序">
+                <button class="active" data-sort="heat">热度</button>
+                <button data-sort="volume">成交</button>
+            <button data-sort="risk">风险</button>
+            <button data-sort="watch">自选</button>
+          </div>
+            </div>
+            <div class="token-list" id="tokenList"></div>
+          </section>
+
+          <aside class="detail-pane" aria-label="详情">
+            <section class="radar-visual">
+              <canvas id="radarCanvas" width="420" height="260"></canvas>
+              <div class="radar-copy">
+                <p class="eyebrow">Signal</p>
+                <h3 id="selectedName">选择一个代币</h3>
+                <p id="selectedSummary">查看动量、风险、新闻催化和资金流。</p>
+              </div>
+            </section>
+
+            <section class="mini-section risk-panel" id="riskPanel">
+              <div class="section-head flat">
+                <h3>风控检查</h3>
+                <span id="riskStatus" class="status-pill">等待</span>
+              </div>
+              <div id="riskDetail"></div>
+            </section>
+
+            <section class="mini-section">
+              <div class="section-head flat">
+                <h3>信号流</h3>
+                <button id="pauseStream" class="ghost-button">暂停</button>
+              </div>
+              <div class="event-feed" id="eventFeed"></div>
+            </section>
+
+            <section class="mini-section">
+              <div class="section-head flat">
+                <h3>新闻</h3>
+                <span id="newsStatus" class="status-pill">同步中</span>
+              </div>
+              <div class="news-feed" id="newsFeed"></div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js?v=5" defer></script>
+  </body>
+</html>
