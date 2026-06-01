@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: yingying-meme-radar
-    runtime: python
-    plan: free
-    rootDir: yingying-meme-radar-cloud
-    buildCommand: ""
-    startCommand: "python server.py"
-    autoDeploy: true
