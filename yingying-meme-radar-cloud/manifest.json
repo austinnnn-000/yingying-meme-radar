@@ -1,0 +1,19 @@
+{
+  "name": "嘤嘤 Meme Radar",
+  "short_name": "嘤嘤雷达",
+  "description": "自用链上 meme 币与新闻动态雷达。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f7f2",
+  "theme_color": "#101416",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
